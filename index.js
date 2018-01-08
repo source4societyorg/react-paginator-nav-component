@@ -1,58 +1,50 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
 
-const calculateNumberButtons = (currentPage, maxPage, displayPages) => {
-  let numberButtons = displayPages;
-  if((currentPage + displayPages) > maxPage) {
-    numberButtons = maxPage - currentPage;
+const renderPaginatorButton = (label, key, paginatorAction, pageNumber, paginatorCallback) => (
+    <button key={label} className={'paginator ' + label} onClick={(evt) => {evt.preventDefault(); paginatorCallback(paginatorAction, key, pageNumber)}}>{label}</button>
+);
+
+const renderPreviousButton = (previousKey, pageNumber, paginatorCallback) => (
+  (pageNumber > 1 || (typeof previousKey !== 'undefined' && previousKey !== null && previousKey !== '')) ? (
+      renderPaginatorButton('Previous', previousKey, 'previous', pageNumber, paginatorCallback)
+  ) : (null)
+);
+
+const renderNextButton = (nextKey, pageNumber, paginatorCallback, maxPage = 0) => {
+  if (maxPage === 0 || pageNumber < maxPage) {
+    return typeof nextKey !== 'undefined' && nextKey !== null && Object.keys(nextKey).length > 0 ? (
+        renderPaginatorButton('Next', nextKey, 'next', pageNumber, paginatorCallback)
+    ) : null
   }
-  return numberButtons;
-};
+}
 
-const renderPaginatorButton = (page, linkPath, label, currentPage) => (
-    <button key={label} className={currentPage == page ? 'selected': ''}><Link to={linkPath + '/' + page}>{label}</Link></button>
-);
+const renderPageNumber = (pageNumber) => (
+  <span className={'page-number'}>{pageNumber}</span> 
+)
 
-const renderPaginatorButtons = (id, {currentPage: currentPage, maxPage: maxPage, displayPages: displayPages, path: path,  ...props}) => (
-    [...Array(calculateNumberButtons(currentPage, maxPage, displayPages)).keys()].map((_, i) => (renderPaginatorButton(i+currentPage, path, i+currentPage+'', currentPage)))
-);
-
-const renderPreviousButton = (id, { currentPage: currentPage, path: path, ...props}) => (
-    currentPage > 1 ? (
-        renderPaginatorButton(currentPage-1, path, '<', currentPage)
-    ) : (null)
-);
-
-const renderNextButton = (id, { currentPage: currentPage, maxPage: maxPage, path: path, ...props}) => (
-    currentPage < maxPage ? (
-        renderPaginatorButton(currentPage+1, path, '>', currentPage)
-    ) : (null)
-);
-
-const PaginatorNav = ({id: id, ...props}) => (
-    props.maxPage > 0 ? (
+const PaginatorNav = ({id: id, previousKey: previousKey, nextKey:nextKey, pageNumber: pageNumber, paginatorCallback: paginatorCallback, maxPage: maxPage, ...props}) => (
+    ((typeof nextKey !== 'undefined' && nextKey !== null) || (pageNumber > 1)) ? (
         <div className={'paginatorNav ' + id}>
-          {renderPreviousButton(id, props)}
-          {renderPaginatorButtons(id, props)}
-          {renderNextButton(id, props)}
+          {renderPreviousButton(previousKey, pageNumber, paginatorCallback)}
+          {renderPageNumber(pageNumber)}
+          {renderNextButton(nextKey, pageNumber, paginatorCallback, maxPage)}
         </div>
     ) : (null)
-)
+);
 
 PaginatorNav.defaultProps = {
   id: '',
-  currentPage: 1,
-  displayPages: 5,
   maxPage: 0,
 };
 
 PaginatorNav.propTypes = {
   id: PropTypes.string,
-  currentPage: PropTypes.number,
-  maxPage: PropTypes.number,
-  displayPages: PropTypes.number,
-  path: PropTypes.string.isRequired,
+  currentKey: PropTypes.object,
+  nextKey: PropTypes.object,
+  previousKey: PropTypes.object,
+  pageNumber: PropTypes.number,
+  paginatorCallback: PropTypes.func.isRequired,
 };
 
 export default PaginatorNav;
