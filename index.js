@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 const calculateNumberButtons = (currentPage, maxPage, displayPages) => {
   let numberButtons = displayPages;
   if((currentPage + displayPages) > maxPage) {
-    numberButtons = maxPage - currentPage;
+    numberButtons = (maxPage - currentPage + 1);
   }
   return numberButtons;
 };
