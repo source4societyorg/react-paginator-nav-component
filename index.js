@@ -1,8 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const renderPaginatorButton = (label, key, paginatorAction, pageNumber, paginatorCallback) => (
-    <button key={label} className={'paginator ' + label} onClick={(evt) => {evt.preventDefault(); paginatorCallback(paginatorAction, key, pageNumber)}}>{label}</button>
+const calculateNumberButtons = (currentPage, maxPage, displayPages) => {
+  let numberButtons = displayPages;
+  if((currentPage + displayPages) > maxPage) {
+    numberButtons = (maxPage - currentPage + 1);
+  }
+  return numberButtons;
+};
+
+const renderPaginatorButton = (page, linkPath, label, currentPage) => (
+    <button key={label} className={currentPage == page ? 'selected': ''}><Link to={linkPath + '/' + page}>{label}</Link></button>
 );
 
 const renderPreviousButton = (previousKey, pageNumber, paginatorCallback) => (
