@@ -1,4 +1,5 @@
 import React from 'react';
+import utilities from '@source4society/scepter-utility-lib';
 import PropTypes from 'prop-types';
 
 const calculateNumberButtons = (currentPage, maxPage, displayPages) => {
@@ -9,8 +10,16 @@ const calculateNumberButtons = (currentPage, maxPage, displayPages) => {
   return numberButtons;
 };
 
-const renderPaginatorButton = (page, linkPath, label, currentPage) => (
-    <button key={label} className={currentPage == page ? 'selected': ''}><Link to={linkPath + '/' + page}>{label}</Link></button>
+const renderPaginatorButton = (page, linkPath, label, currentPage, paginatorCallback) => (
+    <button key={label} className={currentPage == page ? 'selected': ''}>
+    {
+      utilities.isEmpty(paginatorCallback) ? (
+       <Link to={linkPath + '/' + page}>{label}</Link>
+      ) : ( 
+       <a onClick={(evt) => paginatorCallback(label)}>{label}</a>
+      )
+    }
+    </button>
 );
 
 const renderPreviousButton = (previousKey, pageNumber, paginatorCallback) => (
@@ -52,7 +61,7 @@ PaginatorNav.propTypes = {
   nextKey: PropTypes.object,
   previousKey: PropTypes.object,
   pageNumber: PropTypes.number,
-  paginatorCallback: PropTypes.func.isRequired,
+  paginatorCallback: PropTypes.func,
 };
 
 export default PaginatorNav;
